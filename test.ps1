@@ -6,3 +6,4 @@
 Remove-ItemProperty -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\RunMRU" -Name "*"
 Remove-Item "$env:USERPROFILE\Documents\PowerShell\ConsoleHost_history.txt"
 del test.ps1
+exit
